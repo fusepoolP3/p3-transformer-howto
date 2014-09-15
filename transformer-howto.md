@@ -31,10 +31,11 @@ Java-based transformer by leveraging the P3 transformer library.
 ## A Simple Transformer
 
 To showcase how general P3 transformers can be, we will start with a
-simple example of a transformer that takes: _i)_ a text document, and;
-_ii)_ a stream editor ([`sed`](http://en.wikipedia.org/wiki/Sed))
-script; and outputs the result, in plain text, of applying the script
-to the input document. To access `sed` from Java, we will rely on the
+simple example of a transformer that takes as input: _i)_ a text
+document, and; _ii)_ a stream editor
+([`sed`](http://en.wikipedia.org/wiki/Sed)) script; and outputs the
+result, in plain text, of applying the script to the input
+document. To access `sed` from Java, we will rely on the
 [Unix4j libraries](https://code.google.com/p/unix4j/).
 
 Most of the work in implementing a simple transformer goes into
