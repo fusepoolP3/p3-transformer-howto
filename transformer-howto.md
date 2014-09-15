@@ -214,7 +214,7 @@ curl -XPOST -H 'Content-Type: text/plain' -d 'Hello, World!' 'http://localhost:8
 
 should print:
 
-```
+```bash
 Goodbye, World!
 ```
 
@@ -226,12 +226,12 @@ always a good idea, especially for transformers that take _long_ to
 perform their tasks.  For such kind of long-running transformations,
 it is best to write an _asynchronous_ transformer instead.
 
-## Asynchronous Wrapping With `LongRunningTransformerWrapper`
+## Wrapping With `LongRunningTransformerWrapper`
 
 A very simple way to make `SedTransformer` asynchronous is to change
 `isLongRunning` so that it always returns `true`:
 
-```
+```java
 @Override public boolean isLongRunning() { return true; }
 ```
 
@@ -241,7 +241,7 @@ by the runtime, effectively making it asynchronous. Now, when we post
 the transformation with `curl`, instead of an immediate response, we
 get: <a name="async-curl"></a>
 
-```
+```bash
 HTTP/1.1 202 Accepted
 Location: /job/f3b6317f-ad60-4f75-b8f1-00a7f2ec4602
 ```
@@ -252,14 +252,14 @@ business in the meantime. The path
 `/job/f3b6317f-ad60-4f75-b8f1-00a7f2ec4602` represents the
 transformation job, and it can be polled by issuing a GET request:
 
-```
+```bash
 curl -i -XGET 'http://localhost:8080/job/f3b6317f-ad60-4f75-b8f1-00a7f2ec4602'
 ```
 
 which will either return an HTTP 202, if the transformation has not
 yet completed, or `Goodbye, World!` (with an HTTP 200) if it is.
 
-## Making the `sed` Transformer "Native" Asynchronous
+## A "Native" Asynchronous Transformer
 
 Although overriding `isLongRunning` is simple, it will not always
 suffice. For example, `LongRunningTransformerWrapper` creates a thread
