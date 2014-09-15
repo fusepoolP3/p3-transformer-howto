@@ -318,7 +318,7 @@ of a request. It should return `true` if the request is complete, or
 
 Finally, `activate` is a lifecycle method. It will be called at
 transformer startup (before any requests are dispatched) to install a
-[CallBackHandler]. `CallBackHandlers` are going to be later used to
+`CallBackHandler`. `CallBackHandlers` are going to be later used to
 report results asynchronously to clients.
 
 ## Implementing a Queuing `sed` Transformer
