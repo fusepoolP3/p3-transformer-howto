@@ -18,9 +18,9 @@ public class AsyncSedTransformer extends SedTransformer implements AsyncTransfor
 
     private final static int MAX_REQUEST_BACKLOG = 100;
 
-    private final LinkedBlockingQueue<String> fQueue = new LinkedBlockingQueue<String>(MAX_REQUEST_BACKLOG);
+    private final LinkedBlockingQueue<String> fQueue = new LinkedBlockingQueue<>(MAX_REQUEST_BACKLOG);
 
-    private final ConcurrentHashMap<String, HttpRequestEntity> fActive = new ConcurrentHashMap<String, HttpRequestEntity>();
+    private final ConcurrentHashMap<String, HttpRequestEntity> fActive = new ConcurrentHashMap<>();
 
     private volatile CallBackHandler fCallback;
 

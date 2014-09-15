@@ -75,12 +75,12 @@ library which input and output formats our `Transformer` consumes and
 produces, respectively. These will be later used by the platform to
 understand which transfomers can be wired together into longer
 pipelines. Since we produce and consume `text/plain`, we just have to
-provide that:
+provide that information:
 
 ```java
 public class SedTransformer {
 
-	private static final MIME_TEXT_PLAIN;
+	private static final MimeType MIME_TEXT_PLAIN;
 	
 	static {
 		try {
@@ -91,7 +91,7 @@ public class SedTransformer {
 		}
 	}
 
-	private static final HashSet<String> IO_FORMAT = Collections
+	private static final Set<MimeType> IO_FORMAT = Collections
 		.unmodifiableSet(new HashSet<MimeType>() {{
 			add(MIME_TEXT_PLAIN);
 	    }});
@@ -162,10 +162,10 @@ This implementation does basically four things:
    [`WritingEntity`](https://github.com/fusepoolP3/p3-transformer-commons/blob/master/src/main/java/eu/fusepool/p3/transformer/commons/Entity.java)---
    a special type of `Entity`---to use as the content for the
    reply. When using `WritingEntity`, we just have to supply the MIME
-   type (by overriding `getType`), and a way to write the contents of
-   the transformation to an `OutputStream` (by overriding
-   `writeData`). For a finer-grained control, we could also implement
-   the
+   type of the output (by overriding `getType`), and a way to write
+   the contents of the transformation to an `OutputStream` (by
+   overriding `writeData`). For a finer-grained control, we could also
+   implement the
    [Entity](https://github.com/fusepoolP3/p3-transformer-commons/blob/master/src/main/java/eu/fusepool/p3/transformer/commons/Entity.java)
    interface directly.
 
@@ -324,8 +324,8 @@ report results asynchronously to clients.
 
 We start by providing an implementation for the `transform` method. To
 make things easier (e.g. reusing the
-`getSupportedInputs`/`getSupportedOutputs`) we make our asynchronous transformer
-extend the synchronous one.
+`getSupportedInputFormats`/`getSupportedOutputFormats`) we make our
+asynchronous transformer extend the synchronous one.
 
 ```java
 public class AsyncSedTransformer extends SedTransformer implements AsyncTransformer {
