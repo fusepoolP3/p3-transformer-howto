@@ -31,10 +31,13 @@ Java-based transformer by leveraging the P3 transformer library.
 ## A Simple Transformer
 
 To showcase how general P3 transformers can be, we will start with a
-simple example of a transformer that takes a text document and a
-stream editor ([`sed`](http://en.wikipedia.org/wiki/Sed) script and
-outputs the result of applying the script to the document, again in
-plain text. To access `sed` from Java, we will rely on the
+simple example of a transformer that takes:
+
+1. a text document, and;
+2. a stream editor ([`sed`](http://en.wikipedia.org/wiki/Sed)) script;
+
+and outputs the result, in plain text, of applying the script to the
+input document. To access `sed` from Java, we will rely on the
 [Unix4j libraries](https://code.google.com/p/unix4j/).
 
 Most of the work in implementing a simple transformer goes into
@@ -170,8 +173,9 @@ This implementation does basically four things:
    interface directly.
 
 Note that we have not discussed the `isLongRunning` method---this is
-because it will be the subject of our [next example](#complex). For now,
-we assume it is just overridden to always return `false`.
+because it will be the subject of our
+[next example](#user-content-complex). For now, we assume it is just
+overridden to always return `false`.
 
 The last missing piece is how to run the transformer as an HTTP
 server, and the library also provides a simple way to achieve
@@ -191,7 +195,7 @@ This creates a
 (a Jetty-based HTTP server) and runs it on the port specified by the
 first command line argument. To make it easier to manage dependencies
 and run the example, you can download the code and a Maven project
-[here]().
+[here](https://github.com/fusepoolP3/p3-transformer-howto/tree/master/transformer-sed).
 
 To build and run, switch to the project folder and run:
 
@@ -205,8 +209,7 @@ the [synchronous transformer API](). We can now start transforming!
 Posting:
 
 ```bash
-curl -XPOST -H 'Content-Type: text/plain' -d 'Hello, World!'
-	'http://localhost:8080?script=s/Hello/Goodbye/'
+curl -XPOST -H 'Content-Type: text/plain' -d 'Hello, World!' 'http://localhost:8080?script=s/Hello/Goodbye/'
 ```
 
 should print:
@@ -223,10 +226,10 @@ always a good idea, especially for transformers that take _long_ to
 perform their tasks.  For such kind of long-running transformations,
 it is best to write an _asynchronous_ transformer instead.
 
-## Using `LongRunningTransformerWrapper` with `isLongRunning`
+## Asynchronous Wrapping With `LongRunningTransformerWrapper`
 
-A very simple way to make `SedTransformer` asynchronous is to just
-change `isLongRunning` to return `true`:
+A very simple way to make `SedTransformer` asynchronous is to change
+`isLongRunning` so that it always returns `true`:
 
 ```
 @Override public boolean isLongRunning() { return true; }
@@ -256,7 +259,7 @@ curl -i -XGET 'http://localhost:8080/job/f3b6317f-ad60-4f75-b8f1-00a7f2ec4602'
 which will either return an HTTP 202, if the transformation has not
 yet completed, or `Goodbye, World!` (with an HTTP 200) if it is.
 
-## A "Native" Asynchronous Transformer
+## Making the `sed` Transformer "Native" Asynchronous
 
 Although overriding `isLongRunning` is simple, it will not always
 suffice. For example, `LongRunningTransformerWrapper` creates a thread
@@ -267,7 +270,7 @@ desired, it is best to implement the
 [`AsyncTransformer`](https://github.com/fusepoolP3/p3-transformer-library/blob/master/src/main/java/eu/fusepool/p3/transformer/AsyncTransformer.java)
 interface directly.
 
-### The AsyncTransformer Interface
+### The `AsyncTransformer` Interface
 
 The `AsyncTransformer` interface differs from `SyncTransformer` in two
 major ways:
@@ -430,12 +433,13 @@ public static void main(String[] args) throws Exception {
 }
 ```
 
-Again, the project with a Maven build can be found [here](). After
+Again, the project with a Maven build can be found
+[here](https://github.com/fusepoolP3/p3-transformer-howto/tree/master/transformer-sed). After
 packaging, the asynchronous transformer can be run with:
 
 ```
 java -cp ./target/transformer-howto-1.0-jar-with-dependencies.jar p3.fusepool.transformers.sed.SedTransformer 8080
 ```
 
-And we can interact it in a similar way as [before](#async-curl), by means of the
+and we can interact it in a similar way as [before](#user-content-async-curl), by means of the
 asynchronous API.
