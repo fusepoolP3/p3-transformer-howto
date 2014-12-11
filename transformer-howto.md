@@ -79,7 +79,7 @@ pipelines. Since we produce and consume `text/plain`, we just have to
 provide that information:
 
 ```java
-public class SedTransformer {
+public class SedTransformer implements SyncTransformer {
 
 	private static final MimeType MIME_TEXT_PLAIN;
 	
@@ -92,10 +92,8 @@ public class SedTransformer {
 		}
 	}
 
-	private static final Set<MimeType> IO_FORMAT = Collections
-		.unmodifiableSet(new HashSet<MimeType>() {{
-			add(MIME_TEXT_PLAIN);
-	    }});
+	private static final Set<MimeType> IO_FORMAT =
+		Collections.singleton(MIME_TEXT_PLAIN);
 
 	@Override
     public Set<MimeType> getSupportedInputFormats() {
@@ -203,8 +201,9 @@ java -cp ./target/transformer-howto-1.0-jar-with-dependencies.jar p3.fusepool.tr
 ```
 
 since we implemented `SyncTransformer`, the transformer it complies to
-the [synchronous transformer API](). We can now start transforming!
-Posting:
+the
+[synchronous transformer API](https://github.com/fusepoolP3/overall-architecture/blob/master/transformer-api.md). We
+can now start transforming!  Posting:
 
 ```bash
 curl -XPOST -H 'Content-Type: text/plain' -d 'Hello, World!' 'http://localhost:8080?script=s/Hello/Goodbye/'
@@ -215,6 +214,44 @@ should print:
 ```bash
 Goodbye, World!
 ```
+
+## Transformer or Transformer Factory?
+
+Now that we have covered the basics, we can start going deeper into
+conceptual nuances to make an important distinction: `SedTransformer`
+is not really a transformer, but a _transformer factory_.
+
+Indeed, in the strictest sense, a transformer is something that takes
+*one* input and produces *one* output, but `SedTransformer` takes two:
+the `sed` expression, and the input data. So we have to get rid of
+one.
+
+Fortunately, however, this is a lot easier than it seems. Since URIs
+can be treated as opaque objects, all we have to do to eliminate an
+input is to treat the `sed` expression as part of the URI itself. 
+
+The URI in our
+example---`http://localhost:8080?script=s/Hello/Goodbye/`---then,
+would refer to a specific transformer that replaces "Hello" with
+"Goodbye".  This is a transformer, as it takes a single input---the
+input text---and not two as before. 
+
+Clearly, this only works if we have a factory that works like ours;
+i.e., that defines a transformer uniquely by taking its
+"configuration" as a query parameters in the URI itself.
+
+This is, indeed, the way we do things in Fusepool P3: one builds a
+transformer factory like we did, and then generates transformers from
+it. Concrete, single-input transformer URIs are then typically (but
+not necessarily) placed into a
+[_transformer registry_](https://github.com/fusepoolP3/overall-architecture/blob/master/transformer-registry-api.md)
+from where they can, for instance, be accessed by the end-user to
+compose more complex transformation pipelines.
+
+To avoid being verbose, we will be somewhat sloppy in the remainder of
+this text and continue referring to `SedTransformer` as a transformer
+as opposed to a transformer factory. Keep in mind, however, that a
+distinction nevertheless exists.
 
 ## <a name="complex"></a> Making `SedTransformer` Asynchronous
 
