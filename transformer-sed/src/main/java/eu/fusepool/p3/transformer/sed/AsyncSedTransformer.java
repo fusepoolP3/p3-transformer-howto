@@ -2,7 +2,6 @@ package eu.fusepool.p3.transformer.sed;
 
 import eu.fusepool.p3.transformer.AsyncTransformer;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
-import eu.fusepool.p3.transformer.server.TransformerServer;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +42,12 @@ public class AsyncSedTransformer extends SedTransformer implements AsyncTransfor
     }
 
     @Override
+    public boolean isLongRunning() {
+        return true;
+    }
+
+
+    @Override
     public boolean isActive(String requestId) {
         return fActive.containsKey(requestId);
     }
@@ -80,24 +85,6 @@ public class AsyncSedTransformer extends SedTransformer implements AsyncTransfor
             } catch (Exception ex) {
                 fCallback.reportException(requestId, ex);
             }
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        if (args.length < 1) {
-            System.err.println("Missing port parameter.\n" +
-                    "Usage: " + AsyncSedTransformer.class.getSimpleName() + " [PORT]");
-            System.exit(-1);
-        }
-
-        TransformerServer server = new TransformerServer(Integer.parseInt(args[0]));
-        server.start(new AsyncSedTransformer());
-
-        try {
-            server.join();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
         }
     }
 
